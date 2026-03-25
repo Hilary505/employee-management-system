@@ -1,12 +1,13 @@
 package com.company.controller;
 
 import com.company.model.Employee;
-import com.company.service.EmployeeService;  // interface
+import com.company.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -48,5 +49,17 @@ public class EmployeeController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // GET /api/employees/department/{department} → 200 OK
+    @GetMapping("/department/{department}")
+    public ResponseEntity<List<Employee>> getByDepartment(@PathVariable String department) {
+        return ResponseEntity.ok(service.getByDepartment(department));
+    }
+
+    // GET /api/employees/salary?above=5000 → 200 OK
+    @GetMapping("/salary")
+    public ResponseEntity<List<Employee>> getBySalaryAbove(@RequestParam BigDecimal above) {
+        return ResponseEntity.ok(service.getBySalaryAbove(above));
     }
 }
