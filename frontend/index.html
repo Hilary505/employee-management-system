@@ -10,9 +10,9 @@
 
   <div class="container">
 
-    <!-- Add Employee Form -->
+    <!-- Add / Edit Employee Form -->
     <div class="card">
-      <h2>Add New Employee</h2>
+      <h2 id="formTitle">Add New Employee</h2>
       <div id="alert" class="alert"></div>
       <form id="employeeForm" novalidate>
         <div class="form-group">
@@ -41,6 +41,7 @@
           <div class="field-error" id="err-salary"></div>
         </div>
         <button type="submit" id="submitBtn">Add Employee</button>
+        <button type="button" id="cancelBtn" style="display:none">Cancel</button>
       </form>
     </div>
 
