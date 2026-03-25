@@ -7,44 +7,66 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="card">
-    <h2>Add New Employee</h2>
 
-    <div id="alert" class="alert"></div>
+  <div class="container">
 
-    <form id="employeeForm" novalidate>
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" placeholder="John" />
-        <div class="field-error" id="err-firstName"></div>
+    <!-- Add Employee Form -->
+    <div class="card">
+      <h2>Add New Employee</h2>
+      <div id="alert" class="alert"></div>
+      <form id="employeeForm" novalidate>
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" placeholder="John" />
+          <div class="field-error" id="err-firstName"></div>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" placeholder="Doe" />
+          <div class="field-error" id="err-lastName"></div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="john.doe@example.com" />
+          <div class="field-error" id="err-email"></div>
+        </div>
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input type="text" id="department" placeholder="Engineering" />
+          <div class="field-error" id="err-department"></div>
+        </div>
+        <div class="form-group">
+          <label for="salary">Salary</label>
+          <input type="number" id="salary" placeholder="50000" min="1" />
+          <div class="field-error" id="err-salary"></div>
+        </div>
+        <button type="submit" id="submitBtn">Add Employee</button>
+      </form>
+    </div>
+
+    <!-- Employee Table -->
+    <div class="card table-card">
+      <h2>All Employees</h2>
+      <div id="tableAlert" class="alert"></div>
+      <div class="table-wrapper">
+        <table id="employeeTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Salary</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="6" class="empty-msg">Loading...</td></tr>
+          </tbody>
+        </table>
       </div>
+    </div>
 
-      <div class="form-group">
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" placeholder="Doe" />
-        <div class="field-error" id="err-lastName"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="john.doe@example.com" />
-        <div class="field-error" id="err-email"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="department">Department</label>
-        <input type="text" id="department" placeholder="Engineering" />
-        <div class="field-error" id="err-department"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="salary">Salary</label>
-        <input type="number" id="salary" placeholder="50000" min="1" />
-        <div class="field-error" id="err-salary"></div>
-      </div>
-
-      <button type="submit" id="submitBtn">Add Employee</button>
-    </form>
   </div>
 
   <script src="app.js"></script>
