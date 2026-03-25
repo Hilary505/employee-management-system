@@ -1,6 +1,8 @@
 const API_URL = 'http://localhost:8080/api/employees';
 const fields  = ['firstName', 'lastName', 'email', 'department', 'salary'];
 
+let editingId = null; // tracks which employee is being edited
+
 // ── Helpers ──────────────────────────────────────────────
 
 function clearErrors() {
@@ -27,16 +29,53 @@ function showFieldErrors(errors) {
 }
 
 function resetForm() {
+  editingId = null;
   document.getElementById('employeeForm').reset();
+  document.getElementById('formTitle').textContent = 'Add New Employee';
+  document.getElementById('submitBtn').textContent = 'Add Employee';
+  document.getElementById('cancelBtn').style.display = 'none';
   clearErrors();
 }
+
+// ── Edit ─────────────────────────────────────────────────
+
+async function editEmployee(id) {
+  try {
+    const res = await fetch(`${API_URL}/${id}`);
+    if (!res.ok) throw new Error();
+    const emp = await res.json();
+
+    // Populate form fields with employee data
+    document.getElementById('firstName').value  = emp.firstName;
+    document.getElementById('lastName').value   = emp.lastName;
+    document.getElementById('email').value      = emp.email;
+    document.getElementById('department').value = emp.department;
+    document.getElementById('salary').value     = emp.salary;
+
+    // Switch form to edit mode
+    editingId = id;
+    document.getElementById('formTitle').textContent  = 'Edit Employee';
+    document.getElementById('submitBtn').textContent  = 'Update Employee';
+    document.getElementById('cancelBtn').style.display = 'block';
+
+    // Scroll to form
+    document.getElementById('employeeForm').scrollIntoView({ behavior: 'smooth' });
+    clearErrors();
+  } catch {
+    setAlert('tableAlert', 'Could not load employee data.', 'error');
+  }
+}
+
+// ── Cancel edit ───────────────────────────────────────────
+
+document.getElementById('cancelBtn').addEventListener('click', resetForm);
 
 // ── Table ─────────────────────────────────────────────────
 
 async function fetchEmployees() {
   try {
     const res = await fetch(API_URL);
-    if (!res.ok) throw new Error('Failed to fetch');
+    if (!res.ok) throw new Error();
     const employees = await res.json();
     renderTable(employees);
   } catch {
@@ -74,15 +113,13 @@ async function deleteEmployee(id) {
     const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
 
     if (res.status === 204) {
-      // Remove row from DOM without page refresh
       document.getElementById(`row-${id}`)?.remove();
-
-      // Show empty message if table is now empty
       const tbody = document.getElementById('tableBody');
       if (tbody.children.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">No employees found.</td></tr>`;
       }
       setAlert('tableAlert', 'Employee deleted successfully.', 'success');
+      if (editingId === id) resetForm(); // cancel edit if deleted employee was being edited
     } else if (res.status === 404) {
       setAlert('tableAlert', 'Employee not found.', 'error');
     } else {
@@ -93,12 +130,7 @@ async function deleteEmployee(id) {
   }
 }
 
-function editEmployee(id) {
-  // Placeholder — wire to edit form/modal in next step
-  alert(`Edit employee ${id} — coming soon.`);
-}
-
-// ── Add Employee Form ─────────────────────────────────────
+// ── Add / Edit Form Submit ────────────────────────────────
 
 document.getElementById('employeeForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -106,7 +138,7 @@ document.getElementById('employeeForm').addEventListener('submit', async (e) => 
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Saving...';
+  btn.textContent = editingId ? 'Updating...' : 'Saving...';
 
   const payload = {
     firstName:  document.getElementById('firstName').value.trim(),
@@ -116,24 +148,27 @@ document.getElementById('employeeForm').addEventListener('submit', async (e) => 
     salary:     parseFloat(document.getElementById('salary').value),
   };
 
+  const isEdit   = editingId !== null;
+  const url      = isEdit ? `${API_URL}/${editingId}` : API_URL;
+  const method   = isEdit ? 'PUT' : 'POST';
+  const successStatus = isEdit ? 200 : 201;
+
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
+    const res = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
-    if (res.status === 201) {
-      setAlert('alert', 'Employee added successfully!', 'success');
+    if (res.status === successStatus) {
+      setAlert('alert', isEdit ? 'Employee updated successfully!' : 'Employee added successfully!', 'success');
       resetForm();
-      fetchEmployees(); // refresh table
+      fetchEmployees(); // refresh table without page reload
     } else if (res.status === 400) {
       const errors = await res.json();
-      if (errors.error) {
-        setAlert('alert', errors.error, 'error');
-      } else {
-        showFieldErrors(errors);
-      }
+      errors.error ? setAlert('alert', errors.error, 'error') : showFieldErrors(errors);
+    } else if (res.status === 404) {
+      setAlert('alert', 'Employee not found.', 'error');
     } else {
       setAlert('alert', 'Unexpected error. Please try again.', 'error');
     }
@@ -141,9 +176,9 @@ document.getElementById('employeeForm').addEventListener('submit', async (e) => 
     setAlert('alert', 'Could not connect to server. Is the backend running?', 'error');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Add Employee';
+    btn.textContent = editingId ? 'Update Employee' : 'Add Employee';
   }
 });
 
-// ── Init ──────────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────
 fetchEmployees();
