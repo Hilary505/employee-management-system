@@ -3,6 +3,8 @@ package com.company.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "employees")
@@ -23,7 +25,12 @@ public class Employee {
     @Column(unique = true)
     private String email;
 
+    @NotBlank
     private String department;
+
+    @Positive
+    @Column(nullable = false)
+    private BigDecimal salary;
 
     public Employee() {}
 
@@ -41,4 +48,7 @@ public class Employee {
 
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
+
+    public BigDecimal getSalary() { return salary; }
+    public void setSalary(BigDecimal salary) { this.salary = salary; }
 }
