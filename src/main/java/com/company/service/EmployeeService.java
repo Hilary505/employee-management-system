@@ -1,0 +1,44 @@
+package com.company.service;
+
+import com.company.exception.ResourceNotFoundException;
+import com.company.model.Employee;
+import com.company.repository.EmployeeRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeService(EmployeeRepository repository) {
+        this.repository = repository;
+    }
+
+    public List<Employee> getAll() {
+        return repository.findAll();
+    }
+
+    public Employee getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
+    }
+
+    public Employee create(Employee employee) {
+        return repository.save(employee);
+    }
+
+    public Employee update(Long id, Employee updated) {
+        Employee existing = getById(id);
+        existing.setFirstName(updated.getFirstName());
+        existing.setLastName(updated.getLastName());
+        existing.setEmail(updated.getEmail());
+        existing.setDepartment(updated.getDepartment());
+        return repository.save(existing);
+    }
+
+    public void delete(Long id) {
+        repository.delete(getById(id));
+    }
+}
