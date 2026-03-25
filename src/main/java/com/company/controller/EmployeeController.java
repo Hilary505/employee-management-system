@@ -1,7 +1,7 @@
 package com.company.controller;
 
 import com.company.model.Employee;
-import com.company.service.EmployeeService;
+import com.company.service.EmployeeService;  // interface
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
